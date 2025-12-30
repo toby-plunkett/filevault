@@ -9,8 +9,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install express multer dotenv @azure/storage-blob
-      - run: npm run lint
+      - name: Install Dependencies
+        run: npm install ci
+        working-directory: src/azure-sa
+      
+      - name: Linting
+        run: npm run lint
+        working-directory: src/azure-sa
+
   
   job-2-testing:
     runs-on: ubuntu-latest
