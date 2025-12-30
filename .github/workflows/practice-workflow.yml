@@ -9,6 +9,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - uses: reviewdog/action-eslint@latest
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review # Change reporter.
+          eslint_flags: "src/"
       - run: echo job1
   
   job-2-testing:
