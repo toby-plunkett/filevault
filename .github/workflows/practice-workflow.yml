@@ -1,0 +1,21 @@
+name: this-is-the-workflow-name
+run-name: this-is-the-run-name
+on: [push]
+jobs:
+  job-1-linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: echo job1
+  
+  job-2-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: echo job2
