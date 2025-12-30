@@ -9,13 +9,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install eslint -D    
-      - uses: reviewdog/action-eslint@v1.34.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review # Change reporter.
-          eslint_flags: "src/"
-      - run: echo job1
+      - run: npm install express multer dotenv @azure/storage-blob
+      - run: npm run lint
   
   job-2-testing:
     runs-on: ubuntu-latest
