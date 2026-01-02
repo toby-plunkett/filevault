@@ -40,6 +40,24 @@ jobs:
 
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
+      - name: Load secrets from Key Vault and set Container App env
+        run: |
+          KV_NAME="kv-filevault-dev-001"
+          RG="${{ vars.AZURE_RESOURCE_GROUP }}"
+          APP="${{ vars.AZURE_CONTAINERAPP_NAME }}"
+
+          ACCOUNT_NAME=$(az keyvault secret show --vault-name "$KV_NAME" --name "AZURE-STORAGE-ACCOUNT-NAME" --query value -o tsv)
+          ACCOUNT_KEY=$(az keyvault secret show --vault-name "$KV_NAME" --name "AZURE-STORAGE-ACCOUNT-KEY" --query value -o tsv)
+
+            # Store key as a Container App secret
+          az containerapp secret set -g "$RG" -n "$APP" \
+          --secrets storage-account-key="$ACCOUNT_KEY"
+
+            # Set env vars (key comes from secretref)
+          az containerapp update -g "$RG" -n "$APP" \
+          --set-env-vars AZURE_STORAGE_ACCOUNT_NAME="$ACCOUNT_NAME" \
+          AZURE_STORAGE_ACCOUNT_KEY=secretref:storage-account-key        
+
       - name: Deploy to Azure Container App
         run: |
           az containerapp update \
