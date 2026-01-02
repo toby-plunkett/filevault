@@ -13,18 +13,19 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Debug Azure secrets presence
+        run: |
+            test -n "${{ secrets.AZURE_CLIENT_ID }}" && echo "AZURE_CLIENT_ID: set" || echo "AZURE_CLIENT_ID: MISSING"
+            test -n "${{ secrets.AZURE_TENANT_ID }}" && echo "AZURE_TENANT_ID: set" || echo "AZURE_TENANT_ID: MISSING"
+            test -n "${{ secrets.AZURE_SUBSCRIPTION_ID }}" && echo "AZURE_SUBSCRIPTION_ID: set" || echo "AZURE_SUBSCRIPTION_ID: MISSING"  
+
       - name: Azure Login (OIDC)
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Debug Azure secrets presence
-        run: |
-            test -n "${{ secrets.AZURE_CLIENT_ID }}" && echo "AZURE_CLIENT_ID: set" || echo "AZURE_CLIENT_ID: MISSING"
-            test -n "${{ secrets.AZURE_TENANT_ID }}" && echo "AZURE_TENANT_ID: set" || echo "AZURE_TENANT_ID: MISSING"
-            test -n "${{ secrets.AZURE_SUBSCRIPTION_ID }}" && echo "AZURE_SUBSCRIPTION_ID: set" || echo "AZURE_SUBSCRIPTION_ID: MISSING"    
+  
       - name: Login to ACR
         run: az acr login --name ${{ vars.AZURE_ACR_NAME }}
 
