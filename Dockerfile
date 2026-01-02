@@ -1,6 +1,14 @@
-FROM node:22-alpine
+FROM node:20-alpine
+
 WORKDIR /app
-COPY . .
-RUN npm install express multer dotenv @azure/storage-blob
-WORKDIR /app/src/azure-sa/
-CMD ["node", "./index.js"]
+
+# Copy app manifests first (better caching)
+COPY src/azure-sa/package*.json ./src/azure-sa/
+RUN cd src/azure-sa && npm ci
+
+# Copy the rest of the app
+COPY src/azure-sa/ ./src/azure-sa/
+
+WORKDIR /app/src/azure-sa
+EXPOSE 3000
+CMD ["npm", "start"]

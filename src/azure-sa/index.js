@@ -1,3 +1,5 @@
+console.log("BOOT: starting application");
+
 const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
@@ -89,7 +91,8 @@ app.delete('/files/:key', async (req, res) => {
         res.status(500).send('Failed to delete file.');
     }
 });
+console.log("BOOT: about to listen on", PORT);
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server is running on port ${PORT}`);
 });
