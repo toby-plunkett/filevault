@@ -13,6 +13,15 @@ const PORT = process.env.PORT || 3000;
 
 const upload = multer({ dest: 'uploads/' });
 
+const client = require("prom-client");
+client.collectDefaultMetrics();
+
+const uploadCounter = new client.Counter({
+  name: "app_upload_total",
+  help: "Total number of upload requests received",
+});
+
+
 const sharedKeyCredential = new StorageSharedKeyCredential(
     process.env.AZURE_STORAGE_ACCOUNT_NAME,
     process.env.AZURE_STORAGE_ACCOUNT_KEY
@@ -45,6 +54,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 app.post('/upload', upload.single('file'), async (req, res) => {
+    uploadCounter.inc();
     const fileName = req.body.note;
     if (!fileName) {
         return res.status(400).send('File name is required.');
@@ -71,6 +81,11 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     }
 });
 
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", client.register.contentType);
+  res.end(await client.register.metrics());
+});
+
 app.get('/files', (req, res) => {
     res.json(files);
 });
@@ -91,6 +106,13 @@ app.delete('/files/:key', async (req, res) => {
         res.status(500).send('Failed to delete file.');
     }
 });
+
+console.log(
+  "ROUTES:",
+  app._router.stack
+    .filter(r => r.route)
+    .map(r => Object.keys(r.route.methods)[0].toUpperCase() + " " + r.route.path)
+);
 console.log("BOOT: about to listen on", PORT);
 
 app.listen(PORT, "0.0.0.0", () => {
